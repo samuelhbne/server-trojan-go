@@ -35,7 +35,7 @@ $
 - Please replace "amd64" with the arch match the current box accordingly. For example: "arm64" for AWS ARM64 platform like A1 and t4g instance or 64bit Ubuntu on Raspberry Pi. "arm" for 32bit Raspbian.
 - Please ensure TCP port 80 of the current server is reachable, or TLS cert acquisition will fail otherwise.
 - Please replace 8443 with the TCP port number you want to listen for Trojan-go service.
-- Please replace "<span>my-domain.com</span>" and "my-secret" above with your FULL domain-name and Trojan-go service access password accordingly.
+- Please replace "my-domain.com" and "my-secret" above with your FULL domain-name and Trojan-go service access password accordingly.
 - You can optionally assign a HOOK-URL to update the DDNS domain-name pointing to the current server public IP address.
 - Alternatively, server-trojan-go assumes you've ALREADY set the domain-name pointed to the current server public IP address. server-trojan-go may fail as unable to obtian Letsencrypt cert for the domain-name you set otherwise .
 - You may reach the limitation of 10 times renewal a day applied by Letsencrypt soon if you remove and restart server-trojan-go container too frequent.
