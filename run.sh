@@ -7,9 +7,10 @@ usage() {
 	echo "    -p|--port <port-num>      [Optional] Port number for incoming Trojan-go connection, default 443"
 	echo "    -f|--fake <fake-domain>   [Optional] Fake domain name when access Trojan-go without correct password"
 	echo "    -k|--hook <hook-url>      [Optional] URL to be hit before server execution, for DDNS update or notification"
+	echo "    -c|--china                [Optional] Enable China-site access block to avoid being detected, default disbale"
 }
 
-TEMP=`getopt -o d:w:p:f:k: --long domain:,password:,port:,fake:hook: -n "$0" -- $@`
+TEMP=`getopt -o d:w:p:f:k:c --long domain:,password:,port:,fake:hook:china -n "$0" -- $@`
 if [ $? != 0 ] ; then usage; exit 1 ; fi
 
 eval set -- "$TEMP"
@@ -35,6 +36,8 @@ while true ; do
 			HOOKURL="$2"
 			shift 2
 			;;
+		-c|--china)
+			BLOCKCHINA="true"
 		--)
 			shift
 			break
@@ -64,6 +67,10 @@ if [ -n "${HOOKURL}" ]; then
 	echo
 fi
 
+if [ -z "${BLOCKCHINA}" ]; then
+	BLOCKCHINA="false"
+fi
+
 TRY=0
 while [ ! -f "/root/.acme.sh/${DOMAIN}/fullchain.cer" ]
 do
@@ -82,7 +89,7 @@ cat /etc/trojan-go/server.yaml  \
 	| yq -y " .\"ssl\".\"cert\" |= \"/root/.acme.sh/${DOMAIN}/fullchain.cer\" " \
 	| yq -y " .\"ssl\".\"key\" |= \"/root/.acme.sh/${DOMAIN}/${DOMAIN}.key\" " \
 	| yq -y " .\"ssl\".\"sni\" |= \"${DOMAIN}\" " \
-	| yq -y " .\"router\".\"enabled\" |= false " \
+	| yq -y " .\"router\".\"enabled\" |= ${BLOCKCHINA} " \
 	>/etc/trojan-go/server.yml
 
 exec /usr/local/bin/trojan-go -config /etc/trojan-go/server.yml

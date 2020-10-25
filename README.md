@@ -25,6 +25,7 @@ server-trojan-go -d|--domain <domain-name> -w|--password <password> [-p|--port <
     -p|--port <port-num>      [Optional] Port number for incoming Trojan-go connection, default 443
     -f|--fake <fake-domain>   [Optional] Fake domain name when access Trojan-go without correct password
     -k|--hook <hook-url>      [Optional] URL to be hit before server execution, for DDNS update or notification
+    -c|--china                [Optional] Enable China-site access block to avoid being detected, default disbale
 $ docker run --name server-trojan-go -p 80:80 -p 8443:443 -d samuelhbne/server-trojan-go:amd64 -d my-domain.com -w my-secret
 ...
 $
@@ -53,7 +54,7 @@ proxy-trojan-go -d|--domain <trojan-go-domain> -w|--password <password> [-p|--po
     -w|--password <password>        Password for Trojan-go server access
     -p|--port <port-num>            [Optional] Port number for Trojan-go server connection, default 443
     -m|--mux                        [Optional] Enable Trojan-go mux (incompatible with original Trojan server), default disable
-    -c|--china                    [Optional] Enable China-site access without proxy, default disable
+    -c|--china                      [Optional] Enable China-site access without proxy, default disable
 $ docker run --name proxy-trojan-go -p 1080:1080 -p 65353:53/udp -p 8123:8123 -d samuelhbne/proxy-trojan-go:amd64 -d my-domain.com -p 8443 -w my-secret
 ...
 
