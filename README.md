@@ -2,7 +2,7 @@
 
 Yet another unofficial [Trojan-go](https://github.com/p4gefau1t/trojan-go) server container.
 
-## [Optional] How to build server-trojan docker image
+## [Optional] How to build server-trojan-go docker image
 
 ```shell
 $ git clone https://github.com/samuelhbne/server-trojan-go.git
