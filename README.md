@@ -1,6 +1,6 @@
 # server-trojan-go
 
-Yet another unofficial [Trojan-go](https://github.com/p4gefau1t/trojan-go) server container.
+Yet another unofficial [Trojan-go](https://github.com/p4gefau1t/trojan-go) server container with x86 and arm/arm64 (Raspberry Pi) support.
 
 ## [Optional] How to build server-trojan-go docker image
 
