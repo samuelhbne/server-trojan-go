@@ -14,6 +14,10 @@ WORKDIR /
 COPY --from=builder /trojan-go/build /usr/local/bin/
 COPY --from=builder /trojan-go/example/server.yaml /etc/trojan-go/server.yaml
 
+RUN mkdir -p /usr/share/trojan-go && cd /usr/share/trojan-go \
+    && ln -s geoip.dat /usr/local/bin/geoip.dat \
+    && ln -s geosite.dat /usr/local/bin/geosite.dat
+
 RUN apk add bash socat curl openssl jq
 RUN pip3 install yq
 RUN curl -sSL https://get.acme.sh | sh
