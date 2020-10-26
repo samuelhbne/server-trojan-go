@@ -38,6 +38,7 @@ while true ; do
 			;;
 		-c|--china)
 			BLOCKCHINA="true"
+			;;
 		--)
 			shift
 			break
