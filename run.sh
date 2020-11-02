@@ -1,16 +1,19 @@
 #!/bin/bash
 
 usage() {
-	echo "server-trojan-go -d|--domain <domain-name> -w|--password <password> [-p|--port <port-num>] [-f|--fake <fake-domain>] [-k|--hook <hook-url>]"
+	echo "server-trojan-go -d|--domain <domain-name> -w|--password <password> [-p|--port <port-num>] [-f|--fake <fake-domain>] [-k|--hook <hook-url>] [--wp <websocket-path>] [--sp <shadowsocks-pass>] [--sm <shadowsocks-method>]"
 	echo "    -d|--domain <domain-name> Trojan-go server domain name"
 	echo "    -w|--password <password>  Password for Trojan-go service access"
 	echo "    -p|--port <port-num>      [Optional] Port number for incoming Trojan-go connection, default 443"
 	echo "    -f|--fake <fake-domain>   [Optional] Fake domain name when access Trojan-go without correct password"
 	echo "    -k|--hook <hook-url>      [Optional] URL to be hit before server execution, for DDNS update or notification"
 	echo "    -c|--china                [Optional] Enable China-site access block to avoid being detected, default disbale"
+	echo "    --wp <websocket-path>     [Optional] Enable websocket with websocket-path setting, e.g. '/ws'. default disable"
+	echo "    --sp <shadowsocks-pass>   [Optional] Enable Shadowsocks AEAD with given password, default disable"
+	echo "    --sm <shadowsocks-method> [Optional] Encryption method applied in Shadowsocks AEAD layer, default AES-128-GCM"
 }
 
-TEMP=`getopt -o d:w:p:f:k:c --long domain:,password:,port:,fake:hook:china -n "$0" -- $@`
+TEMP=`getopt -o d:w:p:f:k:c --long domain:,password:,port:,fake:,hook:,china,wp:,sp:,sm: -n "$0" -- $@`
 if [ $? != 0 ] ; then usage; exit 1 ; fi
 
 eval set -- "$TEMP"
@@ -39,6 +42,18 @@ while true ; do
 		-c|--china)
 			BLOCKCHINA="true"
 			;;
+		--wp)
+			WSPATH="$2"
+			shift 2
+			;;
+		--sp)
+			SSPASSWORD="$2"
+			shift 2
+			;;
+		--sm)
+			SSMETHOD="$2"
+			shift 2
+			;;
 		--)
 			shift
 			break
@@ -56,7 +71,7 @@ if [ -z "${PASSWORD}" ] || [ -z "${DOMAIN}" ]; then
 fi
 
 if [ -z "${FAKEDOMAIN}" ]; then
-	FAKEDOMAIN="www.microsoft.com"
+	FAKEDOMAIN="www.un.org"
 fi
 
 if [ -z "${PORT}" ]; then
@@ -70,6 +85,10 @@ fi
 
 if [ -z "${BLOCKCHINA}" ]; then
 	BLOCKCHINA="false"
+fi
+
+if [ -z "${SSMETHOD}" ]; then
+	SSMETHOD="AES-128-GCM"
 fi
 
 TRY=0
@@ -92,5 +111,17 @@ cat /etc/trojan-go/server.yaml  \
 	| yq -y " .\"ssl\".\"sni\" |= \"${DOMAIN}\" " \
 	| yq -y " .\"router\".\"enabled\" |= ${BLOCKCHINA} " \
 	>/etc/trojan-go/server.yml
+
+if [ -n "${WSPATH}" ]; then
+	cat /etc/trojan-go/server.yml \
+		|yq -y ". + {websocket:{enabled:true,path:\"${WSPATH}\",host:\"${DOMAIN}\"}}" > /tmp/server.yml.1
+	mv /tmp/server.yml.1 /etc/trojan-go/server.yml
+fi
+
+if [ -n "${SSPASSWORD}" ]; then
+	cat /etc/trojan-go/server.yml \
+		|yq -y ". + {shadowsocks:{enabled:true,method:\"${SSMETHOD}\",password:\"${SSPASSWORD}\"}}" > /tmp/server.yml.1
+	mv /tmp/server.yml.1 /etc/trojan-go/server.yml
+fi
 
 exec /usr/local/bin/trojan-go -config /etc/trojan-go/server.yml
