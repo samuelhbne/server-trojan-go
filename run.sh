@@ -7,7 +7,7 @@ usage() {
 	echo "    -p|--port <port-num>      [Optional] Port number for incoming Trojan-go connection, default 443"
 	echo "    -f|--fake <fake-domain>   [Optional] Fake domain name when access Trojan-go without correct password"
 	echo "    -k|--hook <hook-url>      [Optional] URL to be hit before server execution, for DDNS update or notification"
-	echo "    -c|--china                [Optional] Enable China-site access block to avoid being detected, default disbale"
+	echo "    -c|--china                [Optional] Enable China-site access block to avoid being detected, default disable"
 	echo "    --wp <websocket-path>     [Optional] Enable websocket with websocket-path setting, e.g. '/ws'. default disable"
 	echo "    --sp <shadowsocks-pass>   [Optional] Enable Shadowsocks AEAD with given password, default disable"
 	echo "    --sm <shadowsocks-method> [Optional] Encryption method applied in Shadowsocks AEAD layer, default AES-128-GCM"
