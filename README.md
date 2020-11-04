@@ -2,7 +2,7 @@
 
 Yet another unofficial [Trojan-go](https://github.com/p4gefau1t/trojan-go) server container with x86 and arm/arm64 (Raspberry Pi) support.
 
-![docker-build](https://github.com/samuelhbne/server-trojan-go/workflows/docker-build/badge.svg)
+![docker-build](https://github.com/samuelhbne/server-trojan-go/workflows/docker-buildx-latest/badge.svg)
 
 ## [Optional] How to build server-trojan-go docker image
 

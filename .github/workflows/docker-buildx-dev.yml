@@ -1,11 +1,11 @@
-name: docker-build
+name: docker-buildx-latest-dev
 
 on:
   push:
     branches: dev
 
 jobs:
-  buildx:
+  multi-arch-latest-dev:
     runs-on: ubuntu-latest
     steps:
       -
@@ -34,31 +34,15 @@ jobs:
             username: ${{ secrets.DOCKERHUB_USERNAME }}
             password: ${{ secrets.DOCKERHUB_TOKEN }}
       -
-        name: Build and push AMD64
+        name: Build and push multi-arch latest-dev
         uses: docker/build-push-action@v2
         with:
             context: .
             file: ./Dockerfile.amd64
-            platforms: linux/amd64
+            platforms: |
+              linux/amd64
+              linux/arm64
+              linux/arm/v7
+              linux/arm/v6
             push: true
-            tags: |
-              ${{ github.repository }}:amd64-dev
-              ${{ github.repository }}:latest-dev
-      -
-        name: Build and push ARM64v8
-        uses: docker/build-push-action@v2
-        with:
-            context: .
-            file: ./Dockerfile.arm64
-            platforms: linux/arm64
-            push: true
-            tags: ${{ github.repository }}:arm64-dev
-      -
-        name: Build and push ARM32v6
-        uses: docker/build-push-action@v2
-        with:
-            context: .
-            file: ./Dockerfile.arm
-            platforms: linux/arm/v6
-            push: true
-            tags: ${{ github.repository }}:arm-dev
+            tags: ${{ github.repository }}:latest-dev
