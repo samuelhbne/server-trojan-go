@@ -41,6 +41,7 @@ while true ; do
 			;;
 		-c|--china)
 			BLOCKCHINA="true"
+			shift 1
 			;;
 		--wp)
 			WSPATH="$2"
