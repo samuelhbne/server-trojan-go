@@ -1,7 +1,7 @@
 #!/bin/bash
 
 usage() {
-	echo "server-trojan-go -d|--domain <domain-name> -w|--password <password> [-p|--port <port-num>] [-f|--fake <fake-domain>] [-k|--hook <hook-url>] [--wp <websocket-path>] [--sp <shadowsocks-pass>] [--sm <shadowsocks-method>]"
+	echo "server-trojan-go -d|--domain <domain-name> -w|--password <password> [-p|--port <port-num>] [-f|--fake <fake-domain>] [-k|--hook <hook-url>] [--wp <websocket-path>] [--sp <shadowsocks-pass>] [--sm <shadowsocks-method>] [--share-cert <cert-path>]"
 	echo "    -d|--domain <domain-name> Trojan-go server domain name"
 	echo "    -w|--password <password>  Password for Trojan-go service access"
 	echo "    -p|--port <port-num>      [Optional] Port number for incoming Trojan-go connection, default 443"
@@ -11,9 +11,10 @@ usage() {
 	echo "    --wp <websocket-path>     [Optional] Enable websocket with websocket-path setting, e.g. '/ws'. default disable"
 	echo "    --sp <shadowsocks-pass>   [Optional] Enable Shadowsocks AEAD with given password, default disable"
 	echo "    --sm <shadowsocks-method> [Optional] Encryption method applied in Shadowsocks AEAD layer, default AES-128-GCM"
+	echo "    --share-cert <cert-path>  [Optional] Waiting for cert populating in given path instead of requesting. default disable"
 }
 
-TEMP=`getopt -o d:w:p:f:k:c --long domain:,password:,port:,fake:,hook:,china,wp:,sp:,sm: -n "$0" -- $@`
+TEMP=`getopt -o d:w:p:f:k:c --long domain:,password:,port:,fake:,hook:,china,wp:,sp:,sm:,share-cert: -n "$0" -- $@`
 if [ $? != 0 ] ; then usage; exit 1 ; fi
 
 eval set -- "$TEMP"
@@ -44,8 +45,13 @@ while true ; do
 			shift 1
 			;;
 		--wp)
-			WSPATH="$2"
-			shift 2
+			if [[ $2 =~ ^\/[A-Za-z0-9_-]{1,16}$ ]]; then
+				WSPATH="$2"
+				shift 2
+			else
+				echo "Websocket path must be 1-16 aplhabets, numbers, '-' or '_' started with '/'"
+				exit 1
+			fi
 			;;
 		--sp)
 			SSPASSWORD="$2"
@@ -53,6 +59,10 @@ while true ; do
 			;;
 		--sm)
 			SSMETHOD="$2"
+			shift 2
+			;;
+		--share-cert)
+			SHARECERT="$2"
 			shift 2
 			;;
 		--)
@@ -95,12 +105,19 @@ fi
 TRY=0
 while [ ! -f "/root/.acme.sh/${DOMAIN}/fullchain.cer" ]
 do
-	/root/.acme.sh/acme.sh --issue --standalone -d ${DOMAIN}
-	((TRY++))
-	if [ $TRY >= 3 ]; then
-		echo "Obtian cert for ${DOMAIN} failed. Check log please."
-		exit 3
+	if [ -n "${SHARECERT}" ]; then
+		echo "Cert populating not found, Waitting..."
+	else
+		echo "Cert requesting..."
+		/root/.acme.sh/acme.sh --issue --standalone -d ${DOMAIN}
+		((TRY++))
+		if [ "${TRY}" -ge 3 ]; then
+			echo "Requesting cert for ${NGDOMAIN} failed. Check log please."
+			exit 3
+		fi
 	fi
+	echo "Wait 10 seconds before cert checking again..."
+	sleep 10
 done
 
 cat /etc/trojan-go/server.yaml  \
@@ -115,13 +132,15 @@ cat /etc/trojan-go/server.yaml  \
 
 if [ -n "${WSPATH}" ]; then
 	cat /etc/trojan-go/server.yml \
-		|yq -y ". + {websocket:{enabled:true,path:\"${WSPATH}\",host:\"${DOMAIN}\"}}" > /tmp/server.yml.1
+		|yq -y ". + {websocket:{enabled:true,path:\"${WSPATH}\",host:\"${DOMAIN}\"}}" \
+		> /tmp/server.yml.1
 	mv /tmp/server.yml.1 /etc/trojan-go/server.yml
 fi
 
 if [ -n "${SSPASSWORD}" ]; then
 	cat /etc/trojan-go/server.yml \
-		|yq -y ". + {shadowsocks:{enabled:true,method:\"${SSMETHOD}\",password:\"${SSPASSWORD}\"}}" > /tmp/server.yml.1
+		|yq -y ". + {shadowsocks:{enabled:true,method:\"${SSMETHOD}\",password:\"${SSPASSWORD}\"}}" \
+		> /tmp/server.yml.1
 	mv /tmp/server.yml.1 /etc/trojan-go/server.yml
 fi
 
