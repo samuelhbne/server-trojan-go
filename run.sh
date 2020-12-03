@@ -102,8 +102,14 @@ if [ -z "${SSMETHOD}" ]; then
 	SSMETHOD="AES-128-GCM"
 fi
 
+if [ -z "${SHARECERT}" ]; then
+	CERTPATH="/root/.acme.sh/${NGDOMAIN}"
+else
+	CERTPATH="${SHARECERT}"
+fi
+
 TRY=0
-while [ ! -f "/root/.acme.sh/${DOMAIN}/fullchain.cer" ]
+while [ ! -f "${CERTPATH}/fullchain.cer" ]
 do
 	if [ -n "${SHARECERT}" ]; then
 		echo "Cert populating not found, Waitting..."
@@ -124,8 +130,8 @@ cat /etc/trojan-go/server.yaml  \
 	| yq -y " .\"local-port\" |= ${PORT} " \
 	| yq -y " .\"remote-addr\" |= \"${FAKEDOMAIN}\" " \
 	| yq -y " .\"password\"[0] |= \"${PASSWORD}\" " \
-	| yq -y " .\"ssl\".\"cert\" |= \"/root/.acme.sh/${DOMAIN}/fullchain.cer\" " \
-	| yq -y " .\"ssl\".\"key\" |= \"/root/.acme.sh/${DOMAIN}/${DOMAIN}.key\" " \
+	| yq -y " .\"ssl\".\"cert\" |= \"${CERTPATH}/fullchain.cer\" " \
+	| yq -y " .\"ssl\".\"key\" |= \"${CERTPATH}/${DOMAIN}.key\" " \
 	| yq -y " .\"ssl\".\"sni\" |= \"${DOMAIN}\" " \
 	| yq -y " .\"router\".\"enabled\" |= ${BLOCKCHINA} " \
 	>/etc/trojan-go/server.yml
