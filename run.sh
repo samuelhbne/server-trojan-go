@@ -103,7 +103,7 @@ if [ -z "${SSMETHOD}" ]; then
 fi
 
 if [ -z "${SHARECERT}" ]; then
-	CERTPATH="/root/.acme.sh/${NGDOMAIN}"
+	CERTPATH="/root/.acme.sh/${DOMAIN}"
 else
 	CERTPATH="${SHARECERT}"
 fi
