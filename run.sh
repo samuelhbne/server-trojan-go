@@ -11,10 +11,10 @@ usage() {
 	echo "    --wp <websocket-path>     [Optional] Enable websocket with websocket-path setting, e.g. '/ws'. default disable"
 	echo "    --sp <shadowsocks-pass>   [Optional] Enable Shadowsocks AEAD with given password, default disable"
 	echo "    --sm <shadowsocks-method> [Optional] Encryption method applied in Shadowsocks AEAD layer, default AES-128-GCM"
-	echo "    --share-cert <cert-path>  [Optional] Waiting for cert populating in given path instead of requesting. default disable"
+	echo "    --cert <cert-path>        [Optional] Reading TLS cert and key from given path instead of requesting"
 }
 
-TEMP=`getopt -o d:w:p:f:k:c --long domain:,password:,port:,fake:,hook:,china,wp:,sp:,sm:,share-cert: -n "$0" -- $@`
+TEMP=`getopt -o d:w:p:f:k:c --long domain:,password:,port:,fake:,hook:,china,wp:,sp:,sm:,cert: -n "$0" -- $@`
 if [ $? != 0 ] ; then usage; exit 1 ; fi
 
 eval set -- "$TEMP"
@@ -61,7 +61,7 @@ while true ; do
 			SSMETHOD="$2"
 			shift 2
 			;;
-		--share-cert)
+		--cert)
 			SHARECERT="$2"
 			shift 2
 			;;

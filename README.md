@@ -31,7 +31,7 @@ server-trojan-go -d|--domain <domain-name> -w|--password <password> [-p|--port <
     --wp <websocket-path>     [Optional] Enable websocket with websocket-path setting, e.g. '/ws'. default disable
     --sp <shadowsocks-pass>   [Optional] Enable Shadowsocks AEAD with given password, default disable
     --sm <shadowsocks-method> [Optional] Encryption method applied in Shadowsocks AEAD layer, default AES-128-GCM
-    --share-cert <cert-path>  [Optional] Waiting for cert populating in given path instead of requesting. default disable
+    --cert <cert-path>        [Optional] Reading TLS cert and key from given path instead of requesting
 
 $ docker run --name server-trojan-go -p 80:80 -p 8443:443 -v /home/ubuntu/mydomain.duckdns.org:/opt/mydomain.duckdns.org -d samuelhbne/server-trojan-go:amd64 -d mydomain.duckdns.org -w my-secret --wp /wsocket --share-cert /opt/mydomain.duckdns.org -k https://duckdns.org/update/mydomain/c9711c65-db21-4f8c-a790-2c32c93bde8c
 ...
@@ -45,10 +45,10 @@ $
 - Please replace 8443 with the TCP port number you want to listen for Trojan-go service.
 - Please replace "mydomain.duckdns.org" and "my-secret" above with your FULL domain-name and the Trojan-go service access password accordingly.
 - Please replace /home/ubuntu/mydomain.duckdns.org with the folder where TLS cert saved.
-- If not pointed by '--share-cert', server-v2ray will request a new TLS cert from Letsencrypt
+- If not appointed by '--cert' option, server-v2ray will request a new TLS cert from Letsencrypt
 - You can optionally assign a HOOK-URL to update the DDNS domain-name pointing to the current server public IP address.
 - Alternatively, server-trojan-go assumes you've ALREADY set the domain-name pointed to the current server public IP address. server-trojan-go may fail as unable to obtain Letsencrypt cert for the domain-name you set otherwise .
-- You may reach the limitation of 10 times renewal a day applied by Letsencrypt soon if you remove and restart server-trojan-go container too frequently in case without applying '--share-cert' option.
+- You may reach the limitation of 10 times renewal a day applied by Letsencrypt soon if you remove and restart server-trojan-go container too frequently in case without applying '--cert' option.
 
 ## How to verify if server-trojan-go is running properly
 
