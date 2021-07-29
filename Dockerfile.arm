@@ -1,4 +1,4 @@
-FROM arm32v6/golang:1.15-alpine as builder
+FROM arm32v6/golang:1.16-alpine as builder
 WORKDIR /
 
 RUN apk add git make && \
