@@ -3,6 +3,7 @@ name: docker-buildx-latest
 on:
   push:
     branches: master
+  pull_request:
 
 jobs:
   multi-arch-latest:
