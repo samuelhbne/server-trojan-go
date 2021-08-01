@@ -20,7 +20,8 @@ RUN mkdir -p /usr/share/trojan-go && cd /usr/share/trojan-go \
 
 RUN apk add bash socat curl openssl jq
 RUN pip3 install yq
-RUN curl -sSL https://get.acme.sh | sh
+RUN cd /root; curl -sSL "https://github.com/acmesh-official/acme.sh/archive/refs/tags/2.9.0.tar.gz"|tar zxvf -
+RUN cd /root; mv acme.sh-2.9.0 .acme.sh
 
 ADD run.sh /run.sh
 RUN chmod 755 /run.sh
